@@ -31,6 +31,25 @@
 @media(max-width:390px){.quick-form{grid-template-columns:1fr}.quick-url{grid-column:auto}}
 @media print{.link-composer{display:none!important}.period-section{break-before:page}.period-card{break-inside:avoid}.period-row{color:#222;border-color:#ddd}.period-labels{color:#555}.period-total{background:#eaf4dc;color:#111}}
 
+/* Editor de conclusiones y recomendaciones */
+.analysis-section .section-heading{display:flex;justify-content:space-between;align-items:end;gap:18px}
+.analysis-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.analysis-tools .outline-button{white-space:nowrap}
+.analysis-card-head{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.analysis-status{font-size:10px;color:#8d9690;margin-top:7px}
+.analysis-status.custom{color:#d7fa69}
+.analysis-editor{margin-top:13px;display:grid;gap:10px}
+.analysis-editor-row{display:grid;grid-template-columns:minmax(0,1fr) 34px;gap:8px;align-items:start}
+.analysis-editor textarea{width:100%;min-height:76px;resize:vertical;background:#111512;color:#eef2ea;border:1px solid #424842;border-radius:9px;padding:10px 11px;font-size:12px;line-height:1.55}
+.analysis-editor textarea:focus{border-color:#d7fa69;outline:none}
+.analysis-editor-row button{width:34px;height:34px;border-radius:8px;border:1px solid #3c4142;background:#202326;color:#aeb4b1;font-size:18px}
+.analysis-editor-row button:hover{color:#ff9787;border-color:#72504b}
+.analysis-add{justify-self:start;margin-top:1px}
+.analysis-edit-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:15px;padding-top:14px;border-top:1px solid #303337;flex-wrap:wrap}
+.analysis-note{margin:12px 0 0;font-size:10px;line-height:1.55;color:#79817d}
+@media(max-width:750px){.analysis-section .section-heading{display:block}.analysis-tools{margin-top:13px}.analysis-tools .outline-button{flex:1}.analysis-edit-actions .outline-button,.analysis-edit-actions .primary-button{flex:1}}
+@media print{.analysis-tools,.analysis-edit-actions,.analysis-add,.analysis-status{display:none!important}}
+
 </style>
 </head>
 <body>
@@ -60,7 +79,7 @@
 
         <section id="ranking" class="ranking-section"><div class="section-heading"><div><div class="eyebrow">LO QUE MÁS RINDIÓ</div><h2>Top 5 contenidos</h2><p>Ordenado por reproducciones. Las publicaciones sin esa cifra no entran al ranking.</p></div></div><div class="ranking-grid"><div class="panel"><div class="rank-head"><span class="platform-icon instagram">◎</span><h3>Instagram</h3></div><div id="instagramRanking"></div></div><div class="panel"><div class="rank-head"><span class="platform-icon tiktok">♪</span><h3>TikTok</h3></div><div id="tiktokRanking"></div></div></div></section>
 
-        <section id="analisis" class="analysis-section"><div class="section-heading"><div><div class="eyebrow">LECTURA DE DATOS</div><h2>Conclusiones y recomendaciones</h2><p>Se recalculan con las publicaciones y el período que selecciones.</p></div></div><div class="analysis-grid"><div class="panel analysis-card"><div class="analysis-icon">↗</div><h3>Conclusiones</h3><div id="conclusions"></div></div><div class="panel analysis-card accent-card"><div class="analysis-icon">✳</div><h3>Próximos pasos</h3><div id="recommendations"></div></div></div><p class="method-note">Interacciones = me gusta + comentarios + compartidos + guardados. Tasa de interacción = interacciones ÷ reproducciones; se calcula solo cuando hay reproducciones ingresadas. Las conclusiones describen estos datos y no atribuyen causas.</p></section>
+        <section id="analisis" class="analysis-section"><div class="section-heading"><div><div class="eyebrow">LECTURA DE DATOS</div><h2>Conclusiones y recomendaciones</h2><p>El análisis se recalcula con tus métricas. También puedes editarlo, sumar puntos y dejar una versión final guardada.</p></div><div class="analysis-tools"><button id="editAnalysisButton" class="outline-button" type="button">✎ Editar análisis</button></div></div><div class="analysis-grid"><div class="panel analysis-card"><div class="analysis-icon">↗</div><div class="analysis-card-head"><h3>Conclusiones</h3></div><div id="conclusions"></div><div id="conclusionsEditor" class="analysis-editor" hidden></div></div><div class="panel analysis-card accent-card"><div class="analysis-icon">✳</div><div class="analysis-card-head"><h3>Próximos pasos</h3></div><div id="recommendations"></div><div id="recommendationsEditor" class="analysis-editor" hidden></div></div></div><div id="analysisStatus" class="analysis-status"></div><div id="analysisEditActions" class="analysis-edit-actions" hidden><button id="resetAnalysisButton" type="button" class="outline-button">↺ Volver al automático</button><button id="cancelAnalysisButton" type="button" class="outline-button">Cancelar</button><button id="saveAnalysisButton" type="button" class="primary-button">Guardar análisis</button></div><p class="method-note">Interacciones = me gusta + comentarios + compartidos + guardados. Tasa de interacción = interacciones ÷ reproducciones. El análisis automático compara volumen, promedios, concentración del rendimiento, interacción y completitud de datos; evita atribuir causas que las métricas por sí solas no demuestran.</p></section>
 
         <section id="publicaciones" class="posts-section"><div class="section-heading post-heading"><div><div class="eyebrow">TU BASE DE CONTENIDOS</div><h2>Publicaciones <span id="postCount" class="count-pill">0</span></h2></div><button id="secondaryAddButton" class="outline-button">＋ Agregar enlace</button></div><div class="panel table-panel"><div id="postsList"></div></div><p class="storage-note">Tus datos se guardan en este navegador. Si borras sus datos o cambias de dispositivo, no aparecerán aquí.</p></section>
       </div>
@@ -73,6 +92,7 @@
 (() => {
   const KEY = 'pulso-social-posts-v1';
   const DEMO_KEY = 'pulso-social-demo-v1';
+  const ANALYSIS_KEY = 'pulso-social-analysis-v2';
   const fallbackStore = new Map();
   const storage = {
     getItem(key){try{return localStorage.getItem(key)}catch{return fallbackStore.get(key)??null}},
@@ -128,16 +148,77 @@
   function renderSplit(data){const ig=data.filter(p=>p.platform==='instagram').length,tt=data.length-ig;const pct=data.length?ig/data.length*100:0;$('platformSplit').innerHTML='<div class="split-total">'+data.length+'<small>publicaciones</small></div><div class="split-bar"><span style="width:'+pct+'%"></span><span style="width:'+(100-pct)+'%"></span></div><div class="split-row"><span class="split-name"><i class="legend-dot ig"></i>Instagram</span><b>'+ig+' · '+(data.length?Math.round(pct):0)+'%</b></div><div class="split-row"><span class="split-name"><i class="legend-dot tt"></i>TikTok</span><b>'+tt+' · '+(data.length?Math.round(100-pct):0)+'%</b></div>'}
   function renderRanking(data,platform){const list=data.filter(p=>p.platform===platform&&viewsKnown(p)).sort((a,b)=>Number(b.views)-Number(a.views)).slice(0,5);$(platform+'Ranking').innerHTML=list.length?list.map((p,i)=>'<div class="rank-row"><span class="rank-num">'+String(i+1).padStart(2,'0')+'</span><div><div class="rank-title" title="'+esc(p.title||'Publicación sin nombre')+'">'+esc(p.title||'Publicación sin nombre')+'</div><div class="rank-meta">'+dateLabel(p.date)+' · '+number(interactions(p))+' interacciones'+(p.demo?' · ejemplo':'')+'</div></div><div class="rank-value">'+compact(p.views)+'<small>reproducciones</small></div></div>').join(''):'<div class="empty-small">Aún no hay publicaciones con reproducciones ingresadas.</div>'}
   function list(items){return '<ul>'+items.map(x=>'<li>'+x+'</li>').join('')+'</ul>'}
-  function renderAnalysis(data){const measured=data.filter(p=>viewsKnown(p));const conclusions=[],recommendations=[];if(!data.length){conclusions.push('Agrega publicaciones para comenzar a leer el rendimiento de este período.');recommendations.push('Pega los enlaces y completa las cifras que quieras comparar.');}else{
-    conclusions.push('Hay '+data.length+' '+(data.length===1?'publicación registrada':'publicaciones registradas')+'; '+measured.length+' '+(measured.length===1?'tiene':'tienen')+' reproducciones informadas.');
-    if(measured.length){const best=measured.slice().sort((a,b)=>Number(b.views)-Number(a.views))[0];conclusions.push('La publicación con más reproducciones es «'+esc(best.title||'Publicación sin nombre')+'» ('+number(best.views)+') en '+(best.platform==='instagram'?'Instagram':'TikTok')+'.');}
-    const ig=measured.filter(p=>p.platform==='instagram'),tt=measured.filter(p=>p.platform==='tiktok');if(ig.length&&tt.length){const avg=a=>Math.round(a.reduce((s,p)=>s+Number(p.views),0)/a.length);conclusions.push('Promedio de reproducciones por publicación medida: Instagram '+number(avg(ig))+'; TikTok '+number(avg(tt))+'.');}
-    const missing=data.filter(p=>!viewsKnown(p)).length;if(missing)recommendations.push('Completa las reproducciones de '+missing+' '+(missing===1?'publicación':'publicaciones')+' para incluirlas en el ranking y la comparación.');
-    const reachMissing=data.filter(p=>p.reach===null||p.reach===undefined).length;if(reachMissing)recommendations.push('Agrega el alcance de '+reachMissing+' '+(reachMissing===1?'publicación':'publicaciones')+' si quieres comparar distribución además de reproducciones.');
-    if(measured.length>=3){const rank=measured.slice().sort((a,b)=>Number(b.views)-Number(a.views));recommendations.push('Revisa el formato y tema de tus '+Math.min(3,rank.length)+' publicaciones con más reproducciones antes de planificar el próximo mes.');}
-    if(data.length<5)recommendations.push('Suma más publicaciones del período antes de sacar conclusiones generales.');
-    if(!recommendations.length)recommendations.push('Compara los temas y formatos del top 5 con los que quedaron más abajo; prueba una variación en el próximo período.');
-  }$('conclusions').innerHTML=list(conclusions);$('recommendations').innerHTML=list(recommendations)}
+  function analysisFilterKey(){return ($('monthSelect').value||'all')+'|'+($('platformSelect').value||'all')}
+  function readAnalysisOverrides(){try{const value=JSON.parse(storage.getItem(ANALYSIS_KEY)||'{}');return value&&typeof value==='object'?value:{}}catch{return {}}}
+  function writeAnalysisOverrides(value){storage.setItem(ANALYSIS_KEY,JSON.stringify(value))}
+  function average(arr,key='views'){return arr.length?arr.reduce((s,p)=>s+Number(p[key]||0),0)/arr.length:0}
+  function median(values){if(!values.length)return 0;const a=values.slice().sort((x,y)=>x-y),m=Math.floor(a.length/2);return a.length%2?a[m]:(a[m-1]+a[m])/2}
+  function pct(v,d){return d?Math.round(v/d*100):0}
+  function platformName(p){return p==='instagram'?'Instagram':'TikTok'}
+  function buildAutoAnalysis(data){
+    const measured=data.filter(p=>viewsKnown(p)&&Number(p.views)>=0), conclusions=[],recommendations=[];
+    if(!data.length){return {conclusions:['No hay publicaciones en esta selección.'],recommendations:['Agrega publicaciones o cambia los filtros para generar una lectura del período.']}}
+    const totalViews=measured.reduce((s,p)=>s+Number(p.views),0);
+    const completeEng=data.filter(p=>viewsKnown(p)&&Number(p.views)>0&&hasEngagement(p));
+    const totalInteractions=completeEng.reduce((s,p)=>s+interactions(p),0);
+    const engViews=completeEng.reduce((s,p)=>s+Number(p.views),0);
+    const overallRate=engViews?totalInteractions/engViews*100:null;
+    const reachKnown=data.filter(p=>p.reach!==null&&p.reach!==undefined&&p.reach!=='');
+    conclusions.push('La selección reúne '+data.length+' '+(data.length===1?'publicación':'publicaciones')+'. '+measured.length+' tienen reproducciones informadas'+(measured.length?'; en conjunto acumulan '+number(totalViews)+'.':'.'));
+    if(measured.length){
+      const ranked=measured.slice().sort((a,b)=>Number(b.views)-Number(a.views));
+      const best=ranked[0], avgViews=Math.round(totalViews/measured.length), medViews=Math.round(median(measured.map(p=>Number(p.views))));
+      conclusions.push('El contenido con mayor volumen es «'+esc(best.title||'Publicación sin nombre')+'» en '+platformName(best.platform)+', con '+number(best.views)+' reproducciones. El promedio del período es '+number(avgViews)+' y la mediana '+number(medViews)+'.');
+      if(ranked.length>=3&&totalViews>0){const topN=ranked.slice(0,Math.min(3,ranked.length));const topShare=pct(topN.reduce((s,p)=>s+Number(p.views),0),totalViews);conclusions.push('Los '+topN.length+' contenidos con más reproducciones concentran el '+topShare+'% del total medido, lo que muestra cuánto depende el resultado global de los mejores desempeños.');}
+    }
+    const ig=measured.filter(p=>p.platform==='instagram'),tt=measured.filter(p=>p.platform==='tiktok');
+    if(ig.length&&tt.length){
+      const igAvg=Math.round(average(ig)),ttAvg=Math.round(average(tt));
+      const diffBase=Math.min(igAvg,ttAvg),diff=diffBase?Math.round((Math.max(igAvg,ttAvg)-diffBase)/diffBase*100):0;
+      const leader=igAvg===ttAvg?'Ambas plataformas':igAvg>ttAvg?'Instagram':'TikTok';
+      conclusions.push('Promedio por publicación medida: Instagram '+number(igAvg)+' vs. TikTok '+number(ttAvg)+'. '+(igAvg===ttAvg?'Ambas plataformas están al mismo nivel promedio.':leader+' registra un promedio '+(diff?diff+'% ':'')+'más alto en esta selección.'));
+    }
+    if(completeEng.length){
+      const bestEng=completeEng.slice().sort((a,b)=>(interactions(b)/Number(b.views))-(interactions(a)/Number(a.views)))[0];
+      const bestRate=interactions(bestEng)/Number(bestEng.views)*100;
+      conclusions.push('La tasa de interacción conjunta de los contenidos calculables es '+overallRate.toFixed(1).replace('.',',')+'%. El mejor resultado individual es «'+esc(bestEng.title||'Publicación sin nombre')+'» con '+bestRate.toFixed(1).replace('.',',')+'%.');
+      const totals={likes:0,comments:0,shares:0,saves:0};completeEng.forEach(p=>Object.keys(totals).forEach(k=>totals[k]+=Number(p[k]||0)));const intTotal=Object.values(totals).reduce((a,b)=>a+b,0);if(intTotal){const strongest=Object.entries(totals).sort((a,b)=>b[1]-a[1])[0];const labels={likes:'me gusta',comments:'comentarios',shares:'compartidos',saves:'guardados'};conclusions.push('Dentro de las interacciones registradas, '+labels[strongest[0]]+' es la señal más frecuente ('+pct(strongest[1],intTotal)+'% del total de interacciones).');}
+    }
+    if(reachKnown.length){const reachTotal=reachKnown.reduce((s,p)=>s+Number(p.reach),0);conclusions.push('Hay alcance informado en '+reachKnown.length+' de '+data.length+' publicaciones, por un total de '+number(reachTotal)+'.');}
+
+    const missingViews=data.length-measured.length,missingReach=data.length-reachKnown.length,missingEng=data.filter(p=>!hasEngagement(p)).length;
+    if(missingViews)recommendations.push('Completa las reproducciones de '+missingViews+' '+(missingViews===1?'publicación':'publicaciones')+' para que el ranking, los promedios y las conclusiones incluyan toda la base.');
+    if(missingReach)recommendations.push('Completa el alcance de '+missingReach+' '+(missingReach===1?'publicación':'publicaciones')+' para distinguir mejor entre volumen de visualización y distribución real.');
+    if(missingEng)recommendations.push('Agrega me gusta, comentarios, compartidos y guardados en '+missingEng+' '+(missingEng===1?'publicación':'publicaciones')+' para comparar calidad de interacción, no solo reproducciones.');
+    if(measured.length>=3){
+      const ranked=measured.slice().sort((a,b)=>Number(b.views)-Number(a.views)),top=ranked.slice(0,Math.min(3,ranked.length));
+      recommendations.push('Usa como benchmark los patrones de «'+top.map(p=>esc(p.title||'Publicación sin nombre')).join('», «')+'»: revisa tema, formato, duración, gancho inicial y CTA, y prueba una variante manteniendo una sola variable a la vez.');
+      if(totalViews){const topShare=pct(top.reduce((s,p)=>s+Number(p.views),0),totalViews);if(topShare>=60)recommendations.push('El rendimiento está concentrado en pocos contenidos ('+topShare+'% de las reproducciones en el top '+top.length+'). Conviene replicar esos aprendizajes, pero también abrir 1–2 pruebas nuevas para no depender de un solo tipo de pieza.');}
+    }
+    if(ig.length&&tt.length){const igAvg=Math.round(average(ig)),ttAvg=Math.round(average(tt));if(igAvg!==ttAvg){const leader=igAvg>ttAvg?'Instagram':'TikTok',other=igAvg>ttAvg?'TikTok':'Instagram';recommendations.push('Toma '+leader+' como referencia de volumen en esta selección y prueba en '+other+' una adaptación del concepto ganador, respetando el lenguaje propio de esa plataforma en vez de copiar la pieza exacta.');}}
+    if(completeEng.length>=2){const rankedEng=completeEng.slice().sort((a,b)=>(interactions(b)/Number(b.views))-(interactions(a)/Number(a.views))),best=rankedEng[0];recommendations.push('Analiza qué hace distinto a «'+esc(best.title||'Publicación sin nombre')+'», que lidera la tasa de interacción, y crea una nueva pieza que replique su lógica de participación sin asumir que el resultado se debe a una sola causa.');}
+    if(data.length<5)recommendations.push('La muestra todavía es pequeña para generalizar. Úsala como señal inicial y vuelve a revisar cuando tengas al menos 5 contenidos comparables en el período.');
+    if(!recommendations.length)recommendations.push('Mantén una prueba controlada para el próximo período: replica un patrón del top, cambia una sola variable y compara reproducciones, alcance y tasa de interacción contra esta base.');
+    return {conclusions:conclusions.slice(0,6),recommendations:recommendations.slice(0,6)};
+  }
+  let analysisEditing=false;
+  let currentAutoAnalysis={conclusions:[],recommendations:[]};
+  function analysisRow(text,type){return '<div class="analysis-editor-row"><textarea data-analysis-type="'+type+'">'+esc(text)+'</textarea><button type="button" data-remove-analysis title="Eliminar">×</button></div>'}
+  function fillAnalysisEditor(type,items){const el=$(type==='conclusions'?'conclusionsEditor':'recommendationsEditor');el.innerHTML=items.map(x=>analysisRow(x,type)).join('')+'<button type="button" class="outline-button analysis-add" data-add-analysis="'+type+'">＋ Agregar punto</button>'}
+  function renderAnalysis(data){
+    currentAutoAnalysis=buildAutoAnalysis(data);
+    const overrides=readAnalysisOverrides(), saved=overrides[analysisFilterKey()];
+    const view=saved&&Array.isArray(saved.conclusions)&&Array.isArray(saved.recommendations)?saved:currentAutoAnalysis;
+    $('conclusions').innerHTML=list(view.conclusions);$('recommendations').innerHTML=list(view.recommendations);
+    $('analysisStatus').textContent=saved?'Versión editada guardada para este filtro. El análisis automático sigue disponible para restablecerlo.':'Análisis automático según los datos visibles en este filtro.';
+    $('analysisStatus').classList.toggle('custom',!!saved);
+    if(!analysisEditing){$('conclusions').hidden=false;$('recommendations').hidden=false;$('conclusionsEditor').hidden=true;$('recommendationsEditor').hidden=true;$('analysisEditActions').hidden=true;$('editAnalysisButton').textContent='✎ Editar análisis';}
+  }
+  function startAnalysisEdit(){const overrides=readAnalysisOverrides(),saved=overrides[analysisFilterKey()],base=saved||currentAutoAnalysis;analysisEditing=true;fillAnalysisEditor('conclusions',base.conclusions);fillAnalysisEditor('recommendations',base.recommendations);$('conclusions').hidden=true;$('recommendations').hidden=true;$('conclusionsEditor').hidden=false;$('recommendationsEditor').hidden=false;$('analysisEditActions').hidden=false;$('editAnalysisButton').textContent='Editando…';$('analisis').scrollIntoView({behavior:'smooth',block:'start'})}
+  function collectAnalysis(type){const root=$(type==='conclusions'?'conclusionsEditor':'recommendationsEditor');return [...root.querySelectorAll('textarea[data-analysis-type]')].map(x=>x.value.trim()).filter(Boolean)}
+  function endAnalysisEdit(){analysisEditing=false;renderAnalysis(activePosts())}
+  function saveAnalysisEdit(){const conclusions=collectAnalysis('conclusions'),recommendations=collectAnalysis('recommendations');if(!conclusions.length&&!recommendations.length){showToast('Agrega al menos un punto antes de guardar');return}const overrides=readAnalysisOverrides();overrides[analysisFilterKey()]={conclusions,recommendations,updatedAt:new Date().toISOString()};writeAnalysisOverrides(overrides);analysisEditing=false;renderAnalysis(activePosts());showToast('Análisis guardado')}
+  function resetAnalysisEdit(){const overrides=readAnalysisOverrides();delete overrides[analysisFilterKey()];writeAnalysisOverrides(overrides);analysisEditing=false;renderAnalysis(activePosts());showToast('Volviste al análisis automático')}
   function renderPosts(data){$('postCount').textContent=data.length;const sorted=data.slice().sort((a,b)=>(b.date||'').localeCompare(a.date||''));$('postsList').innerHTML=sorted.length?'<div class="table-head"><span>CONTENIDO</span><span>FECHA</span><span>REPROD.</span><span>INTERACC.</span><span>ALCANCE</span><span></span></div>'+sorted.map(p=>{const name=esc(p.title||'Publicación sin nombre');return '<div class="post-row"><div class="post-main"><span class="platform-icon '+p.platform+'">'+(p.platform==='instagram'?'◎':'♪')+'</span><div style="min-width:0"><div class="post-title">'+(p.demo?name:'<a href="'+esc(p.url)+'" target="_blank" rel="noopener noreferrer" title="Abrir publicación">'+name+' ↗</a>')+'</div><div class="post-meta">'+(p.demo?'Datos de ejemplo · ':'')+(p.platform==='instagram'?'Instagram':'TikTok')+(viewsKnown(p)?'':' · <span class="pending">faltan métricas</span>')+'</div></div></div><span class="post-number">'+dateLabel(p.date)+'</span><span class="post-number">'+number(p.views)+'</span><span class="post-number">'+(hasEngagement(p)?number(interactions(p)):'—')+'</span><span class="post-number">'+number(p.reach)+'</span><div class="row-actions"><button type="button" data-edit="'+esc(p.id)+'" aria-label="Editar '+name+'" title="Editar">✎</button><button type="button" class="delete" data-delete="'+esc(p.id)+'" aria-label="Eliminar '+name+'" title="Eliminar">×</button></div></div>'}).join(''):'<div class="empty-panel">No hay publicaciones para esta selección. Agrega enlaces o cambia los filtros.</div>'}
   function render(){monthOptions();const data=activePosts();$('demoBanner').hidden=!demo;renderMetrics(data);renderChart();renderSplit(data);renderPeriods();renderRanking(data,'instagram');renderRanking(data,'tiktok');renderAnalysis(data);renderPosts(data)}
   function showToast(s){const el=$('toast');el.textContent=s;el.classList.add('show');clearTimeout(toastTimer);toastTimer=setTimeout(()=>el.classList.remove('show'),3300)}
@@ -153,6 +234,9 @@
   $('secondaryAddButton').addEventListener('click',focusComposer);
   $('closeDialog').addEventListener('click',()=>$('entryDialog').close());$('cancelDialog').addEventListener('click',()=>$('entryDialog').close());
   $('startButton').addEventListener('click',()=>{if(confirm('¿Empezar tu reporte? Se quitarán los datos de ejemplo.')){demo=false;posts=[];$('monthSelect').value='all';save();focusComposer()}});
+  $('editAnalysisButton').addEventListener('click',()=>{if(!analysisEditing)startAnalysisEdit()});
+  $('analysisEditActions').addEventListener('click',e=>{if(e.target.id==='saveAnalysisButton')saveAnalysisEdit();if(e.target.id==='cancelAnalysisButton')endAnalysisEdit();if(e.target.id==='resetAnalysisButton'&&confirm('¿Volver al análisis automático para este filtro? Se eliminará la versión editada guardada.'))resetAnalysisEdit()});
+  $('analisis').addEventListener('click',e=>{const add=e.target.closest('[data-add-analysis]'),remove=e.target.closest('[data-remove-analysis]');if(add){const type=add.dataset.addAnalysis,root=$(type==='conclusions'?'conclusionsEditor':'recommendationsEditor'),row=document.createElement('div');row.className='analysis-editor-row';row.innerHTML='<textarea data-analysis-type="'+type+'" placeholder="Escribe un nuevo punto…"></textarea><button type="button" data-remove-analysis title="Eliminar">×</button>';root.insertBefore(row,add);row.querySelector('textarea').focus()}if(remove)remove.closest('.analysis-editor-row')?.remove()});
   $('printButton').addEventListener('click',()=>window.print());
   render();
   if(document.modelContext?.registerTool){const controller=new AbortController();try{Promise.resolve(document.modelContext.registerTool({name:'add_content_links',title:'Agregar enlaces de contenido',description:'Agrega al reporte publicaciones de Instagram y TikTok con sus fechas de publicación.',inputSchema:{type:'object',properties:{entries:{type:'array',items:{type:'object',properties:{url:{type:'string'},date:{type:'string',description:'Fecha de publicación AAAA-MM-DD'}},required:['url','date'],additionalProperties:false},minItems:1}},required:['entries'],additionalProperties:false},annotations:{readOnlyHint:false,untrustedContentHint:true},execute({entries}){if(!Array.isArray(entries)||!entries.length)throw new Error('Indica al menos una publicación.');const parsed=entries.map(x=>({link:parseLink(x.url),date:x.date}));if(parsed.some(x=>!x.link||!/^\d{4}-\d{2}-\d{2}$/.test(x.date)||isNaN(Date.parse(x.date))))throw new Error('Cada publicación necesita un enlace válido y una fecha AAAA-MM-DD.');const existing=new Set(demo?[]:posts.map(p=>p.url));const unique=parsed.filter(x=>{if(existing.has(x.link.url))return false;existing.add(x.link.url);return true});if(demo&&unique.length){posts=[];demo=false}unique.forEach(x=>posts.push({id:newId(),...x.link,title:'Publicación '+(posts.length+1),date:x.date,views:null,reach:null,likes:null,comments:null,shares:null,saves:null}));if(unique.length){save();$('monthSelect').value=monthKey(unique.at(-1).date);render()}return {added:unique.length,total:posts.length,needs_metrics:unique.length}}},{signal:controller.signal})).catch(()=>{})}catch{}}
